@@ -1,12 +1,14 @@
 require 'gosu'
 
 class GameWindow < Gosu::Window
-  attr_accessor :width, :height, :bullets
+  attr_accessor :width, :height, :bullets, :player_1, :player_2
 
   def initialize
     # Window width and height
     @width = 1200
     @height = 700
+
+    #@font = Gosu::Font.new(self, Gosu::default_font_name, 20)
 
     # Create window
     super @width, @height, false
@@ -33,9 +35,9 @@ class GameWindow < Gosu::Window
 
     detect_collisions
 
-    @bullets.map &:move
-    @player_2.move
-    @player_1.move
+    @bullets.map &:update_and_move
+    @player_2.update_and_move
+    @player_1.update_and_move
   end
 
   def draw
@@ -46,12 +48,21 @@ class GameWindow < Gosu::Window
 
   private
     def detect_collisions
-      if ((@player_2.x - @player_1.x).abs < 30) and ((@player_2.y - @player_1.y).abs < 30)
+      respond_to_player_collisions
+      respond_to_bullet_hits
+    end
+
+    def respond_to_player_collisions
+      if Gosu.distance(@player_1.x, @player_1.y, @player_2.x, @player_2.y) < 30
         collide if @collision_possible
         @collision_possible = false
       else
         @collision_possible = true
       end
+    end
+
+    def respond_to_bullet_hits
+      @bullets.map &:check_collisions
     end
 
     def collide
@@ -95,6 +106,10 @@ class GameWindow < Gosu::Window
       end
       if button_down? Gosu::KbS
         @player_2.decelerate
+      end
+
+      if button_down? Gosu::KbZ
+        @player_2.fire_bullet
       end
     end
 end
