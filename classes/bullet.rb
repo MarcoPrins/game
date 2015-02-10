@@ -12,4 +12,9 @@ class Bullet
     @y = y
     @angle = angle
   end
+
+  def move
+    @x += Gosu::offset_x(@angle, 0.5)
+    @y += Gosu::offset_y(@angle, 0.5)
+  end
 end

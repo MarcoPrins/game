@@ -33,24 +33,18 @@ class GameWindow < Gosu::Window
 
     detect_collisions
 
+    @bullets.map &:move
     @player_2.move
     @player_1.move
   end
 
   def draw
+    @bullets.map &:draw
     @player_1.draw
     @player_2.draw
-
-    draw_bullets
   end
 
   private
-    def draw_bullets
-      self.bullets.each do |bullet|
-        bullet.draw
-      end
-    end
-
     def detect_collisions
       if ((@player_2.x - @player_1.x).abs < 30) and ((@player_2.y - @player_1.y).abs < 30)
         collide if @collision_possible

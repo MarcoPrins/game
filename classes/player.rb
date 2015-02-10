@@ -41,11 +41,15 @@ class Player
   end
 
   def move
+    # Move
     @x += @vel_x
     @y += @vel_y
+
+    # Prevent window exit
     @x %= @window.width
     @y %= @window.height
 
+    # Simulate air resistance
     @vel_x *= 0.95
     @vel_y *= 0.95
   end
