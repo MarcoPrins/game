@@ -55,6 +55,6 @@ class Player
   end
 
   def fire_bullet
-    self.window.bullets << Bullet.new(window, @x, @y, @angle)
+    self.window.bullets << Bullet.new(window, @x, @y, @vel_x, @vel_y, @angle)
   end
 end
