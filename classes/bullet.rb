@@ -2,25 +2,27 @@ require_relative '../modules/draw.rb'
 
 class Bullet
   include Draw
-  attr_accessor :x, :y, :index, :lethal_counter
+  attr_accessor :x,
+                :y,
+                :lethal
+  @@speed = 9
+  @@hit_sound = Gosu::Sample.new("sounds/ouch.mp3")
 
-  def initialize window, x, y, vel_x, vel_y, angle, index
+  def initialize window, player, x, y, vel_x, vel_y, angle
     @window = window
     @image = Gosu::Image.new(window, "images/bullet.png", false)
-
-    # Position in window.bullets array
-    @index = index
+    @player = player
 
     # Lethal to self yet?
-    @lethal_counter = 9
+    @lethal = false
 
     @x = x
     @y = y
     @angle = angle
 
     # Initial boost from moving of man
-    @boost_vel_x = (vel_x * 2.3)
-    @boost_vel_y = (vel_y * 2.3)
+    @boost_vel_x = (vel_x * 2)
+    @boost_vel_y = (vel_y * 2)
   end
 
   def check_collisions
@@ -30,26 +32,43 @@ class Bullet
   end
 
   def check_collisions_with player
-    if Gosu::distance(@x,@y,player.x,player.y) < 30
+    # Update lethal boolean
+    if !@lethal and !(touching? @player, 30)
+      @lethal = true
+    end
+
+    # Check collisions
+    if touching? player, 30
       collide_with player
     end
   end
 
+  def touching? player, threshold
+    player.is_this_point_touching_me? @x, @y, threshold
+  end
+
   def collide_with player
-    if @lethal_counter == 0
+    if @lethal
+      @@hit_sound.play
       player.health -= 1
-      @window.bullets.delete_at @index
-      puts 'OUCH'
+      remove
+      if (player.health <= 0)
+        @window.end_game player
+      end
     end
   end
 
-  def update_and_move
-    if @lethal_counter > 0
-      @lethal_counter -= 1
-    end
+  def remove
+    @window.bullets.delete self
+  end
 
-    @x += @boost_vel_x + Gosu::offset_x(@angle, 4)
-    @y += @boost_vel_y + Gosu::offset_y(@angle, 4)
+  def update_and_move
+    @x += @boost_vel_x + Gosu::offset_x(@angle, @@speed)
+    @y += @boost_vel_y + Gosu::offset_y(@angle, @@speed)
+
+    if (@x <= 0) or (@x >= @window.width) or (@y <= 0) or (@y >= @window.height)
+      remove
+    end
 
     @boost_vel_x *= 0.95
     @boost_vel_y *= 0.95
