@@ -58,7 +58,7 @@ class GameWindow < Gosu::Window
 
   def draw
     @bullets.map &:draw
-    @players.map &:draw
+    @players.map &:draw_test
     draw_health_or_end
     @drug.draw_if
   end
@@ -111,7 +111,7 @@ class GameWindow < Gosu::Window
     end
 
     def collide
-      ratio = 0.8
+      ratio = 1
 
       @player_1.vel_x += (@player_2.vel_x * ratio)
       @player_2.vel_x += (@player_1.vel_x * ratio)

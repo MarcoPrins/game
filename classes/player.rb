@@ -107,8 +107,7 @@ class Player
   def fire_bullet
     if @fire_counter == 0
       @@shoot_sound.play
-      bullets = self.window.bullets
-      bullets << Bullet.new(window, self, @x, @y, @vel_x, @vel_y, @angle)
+      @window.bullets << Bullet.new(window, self, @x, @y, @vel_x, @vel_y, @angle)
       @fire_counter = 15
     end
   end
